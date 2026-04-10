@@ -1,70 +1,81 @@
-//PINES DE LOS SENSORES
-const int s1 =15;
-const int s2 =2;
-const int s3 =4;
-const int s4 =16;
-const int s5 =17;
-const int s6 =5;
+//pines de sensores
+const int S1 = 15;
+const int S2 = 2;
+const int S3 = 4;
+const int S4 = 16;
+const int S5 = 17;
+const int S6 = 5;
 
-//PINES DEL PUENTE H
+//pines puente H
 const int IN1 = 25;
 const int IN2 = 26;
 const int IN3 = 32;
 const int IN4 = 33;
 
-//VARIABLE DE VELOCIDAD
-int velocidadNormal = 230;
+//canales PWM
+const int CH_IN1 = 0;
+const int CH_IN2 = 1;
+const int CH_IN3 = 2;
+const int CH_IN4 = 3;
+const int PWM_FREQ = 1000;
+const int PWM_RES = 8;
 
+//velocidades
+const int NORMAL = 200;
+const int GIRO = 180;
+const int CURVA = 150;
+const int QUIETA = 0;
 
-void setup() {
+//linea perdida
+const unsigned long TIEMPO_PERDIDO = 2000;
+unsigned long tiempoUltimaLinea = 0;
 
-// SENSORES
-pinMode (s1 , INPUT);
-pinMode (s2 , INPUT);
-pinMode (s3 , INPUT);
-pinMode (s4 , INPUT);
-pinMode (s5 , INPUT);
-pinMode (s6 , INPUT);
+//====================
+//SETUP
+//====================
+void setup(){
+  Serial.begin(115200);
 
-//MOTORES
-pinMode (IN1 , OUTPUT);
-pinMode (IN2 , OUTPUT);
-pinMode (IN3 , OUTPUT);
-pinMode (IN4 , OUTPUT);
+  //sensores
+  pinMode(S1, INPUT);
+  pinMode(S2, INPUT);
+  pinMode(S3, INPUT);
+  pinMode(S4, INPUT);
+  pinMode(S5, INPUT);
+  pinMode(S6, INPUT);
 
-Serial.begin (9600);
+  //canales PWM para el DVR8833
+  ledcSetup(CH_IN1, PWM_FREQ, PWM_RES);
+  ledcSetup(CH_IN2, PWM_FREQ, PWM_RES);
+  ledcSetup(CH_IN3, PWM_FREQ, PWM_RES);
+  ledcSetup(CH_IN4, PWM_FREQ, PWM_RES);
+
+  ledcAttacPin(IN1, CH_IN1);
+  ledcAttacPin(IN2, CH_IN2);
+  ledcAttacPin(IN3, CH_IN3);
+  ledcAttacPin(IN4, CH_IN4);
+
+  detener();
+  Serial.println("iniando sistema gei");
 
 }
 
-void loop() {
-int lectura1 = digitalRead (s1);
-int lectura2 = digitalRead (s2);
-int lectura3 = digitalRead (s3);
-int lectura4 = digitalRead (s4);
-int lectura5 = digitalRead (s5);
-int lectura6 = digitalRead (s6);
+//==========
+//loop
+//==========
 
+void loop(){
+  //leer sensores de vergazo
+  bool s[7];
+  s[1] = digitalRead(S1);
+  s[2] = digitalRead(S2);
+  s[3] = digitalRead(S3);
+  s[4] = digitalRead(S4);
+  s[5] = digitalRead(S5);
+  s[6] = digitalRead(S6);
 
-if (lectura1 == LOW && lectura2 == LOW && lectura3 == HIGH && lectura4 == HIGH && lectura5 == LOW && lectura6 == LOW){
-  Serial.println("LINEA DETECTADA: AVANZANDO");
-  Avanzar();  
-}
-
-else if (lectura1 == HIGH && lectura2 == HIGH && lectura3 == LOW && lectura4 == LOW && lectura5 == LOW && lectura6 == LOW){
-  Serial.println("LINEA A LA IZQUIERDA: CURVEADA A LA IZQUIERDA");
-  Girarizquirda ();
-}
-
-else if (lectura1 == LOW && lectura2 == LOW && lectura3 == LOW && lectura4 == LOW && lectura5 == HIGH && lectura6 == HIGH){
-  Serial.println("LINEA A LA DERECHA: CURVEADA A LA DEREECHA");
-  Girarderecha ();
-}
-
-else if (lectura1 == HIGH && lectura2 == LOW && lectura3 == LOW && lectura4 == LOW && lectura5 == LOW && lectura6 == LOW){
-  Serial.print
-}
-
-
-
+  //contar sensores por si se perdio el mampo
+  int activos = s[1] + s[2] + s[3] + s[4] + s[5] + s[6];
+  if (activos > 0) teimpoUltimaLinea = millis();
 
 }
